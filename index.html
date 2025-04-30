@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Printing Portfolio</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Base styles and reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --dark: #1a1a2e;
+            --light: #f7f7f7;
+            --gradient: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        /* Loader animation */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loader {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        
+        .cube {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: var(--primary);
+            animation: cube 2s infinite ease-in-out;
+        }
+        
+        .cube1 {
+            left: 0;
+            animation-delay: -0.5s;
+        }
+        
+        .cube2 {
+            right: 0;
+            animation-delay: 0s;
+        }
+        
+        @keyframes cube {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                background: var(--primary);
+            }
+            50% {
+                transform: translateY(70px) rotate(180deg);
+                background: var(--secondary);
+            }
+        }
+        
+        /* Particle canvas */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+        }
+        
+        /* Header styles */
+        header {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/api/placeholder/1920/1080') center/cover no-repeat;
+            filter: brightness(0.3);
+            z-index: -1;
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(26, 26, 46, 0.6) 100%);
+            z-index: -1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 900px;
+            padding: 0 2rem;
+        }
+        
+        .header-content h1 {
+            font-size: 5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeUp 1s forwards 0.5s;
+        }
+        
+        .header-content p {
+            font-size: 1.5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s forwards 1s;
+            margin-bottom: 2rem;
+        }
+        
+        .header-btn {
+            display: inline-block;
+            background: var(--gradient);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 1s forwards 1.5s;
+        }
+        
+        .header-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.4);
+        }
+        
+        .header-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .header-btn:hover::before {
+            left: 100%;
+        }
+        
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 0;
+            transition: all 0.3s;
+        }
+        
+        nav.scrolled {
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            color: white;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 2.5rem;
+            position: relative;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        /* Main content */
+        main {
+            position: relative;
+            background: var(--dark);
+        }
+        
+        .section-title {
+            position: relative;
+            font-size: 2.5rem;
+            margin-bottom: 4rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 4px;
+            background: var(--gradient);
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        /* About section */
+        .about-section {
+            padding: 8rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .about-content {
+            display: grid;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .about-text {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 1s;
+        }
+        
+        .about-text.animated {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .about-text p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            color: #ccc;
+        }
+        
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-text {
+            color: #ccc;
+        }
+        
+        .about-image {
+            position: relative;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 1s;
+        }
+        
+        .about-image.animated {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .about-image-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+        }
+        
+        .about-image img {
+            width: 100%;
+            display: block;
+            transition: all 0.5s;
+        }
+        
+        .about-image:hover img {
+            transform: scale(1.05);
+        }
+        
+        .about-image::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: var(--primary);
+            filter: blur(100px);
+            z-index: -1;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        .about-image::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--secondary);
+            filter: blur(80px);
+            z-index: -1;
+            top: 50%;
+            right: -50px;
+            animation: float 6s infinite ease-in-out reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(30px) translateX(20px);
+            }
+        }
+        
+        /* Portfolio section */
+        .portfolio-section {
+            padding: 8rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .portfolio-filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            margin: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--gradient);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        
+        .portfolio-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.5s;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .portfolio-item.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .portfolio-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .portfolio-img {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .portfolio-img img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: all 0.5s;
+        }
+        
+        .portfolio-item:hover .portfolio-img img {
+            transform: scale(1.05);
+        }
+        
+        .portfolio-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 2rem;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .portfolio-item:hover .portfolio-overlay {
+            opacity: 1;
+        }
+        
+        .portfolio-overlay h3 {
+            color: white;
+            margin-bottom: 1rem;
+            transform: translateY(-20px);
+            transition: all 0.4s;
+        }
+        
+        .portfolio-item:hover .portfolio-overlay h3 {
+            transform: translateY(0);
+        }
+        
+        .portfolio-overlay p {
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transform: translateY(20px);
+            transition: all 0.4s;
+        }
+        
+        .portfolio-item:hover .portfolio-overlay p {
+            transform: translateY(0);
+        }
+        
+        .portfolio-buttons {
+            display: flex;
+            gap: 1rem;
+            transform: translateY(20px);
+            transition: all 0.4s;
+        }
+        
+        .portfolio-item:hover .portfolio-buttons {
+            transform: translateY(0);
+        }
+        
+        .portfolio-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .portfolio-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+        
+        /* Tech section with 3D elements */
+        .tech-section {
+            padding: 8rem 2rem;
+            background: linear-gradient(to bottom, var(--dark), #15152d);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tech-section::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--primary);
+            filter: blur(150px);
+            opacity: 0.1;
+            top: -100px;
+            left: -100px;
+        }
+        
+        .tech-section::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--secondary);
+            filter: blur(150px);
+            opacity: 0.1;
+            bottom: -100px;
+            right: -100px;
+        }
+        
+        .tech-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tech-title {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+        
+        .tech-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .tech-title p {
+            color: #ccc;
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        .tech-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+        
+        .tech-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .tech-item.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .tech-item:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.07);
+        }
+        
+        .tech-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .tech-item h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .tech-item p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        /* Contact section with glassmorphism */
+        .contact-section {
+            padding: 8rem 2rem;
+            background: url('/api/placeholder/1920/1080') center/cover no-repeat fixed;
+            position: relative;
+        }
+        
+        .contact-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.8);
+        }
+        
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .contact-text {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 1s;
+        }
+        
+        .contact-text.animated {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .contact-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .contact-text p {
+            margin-bottom: 2rem;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+        
+        .contact-info {
+            margin-top: 3rem;
+        }
+        
+        .contact-info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-info-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1.5rem;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .contact-info-text h4 {
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+        }
+        
+        .contact-info-text p {
+            margin-bottom: 0;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        .contact-form {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 1s;
+        }
+        
+        .contact-form.animated {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+        }
+        
+        .form-control::placeholder {
+            color: #999;
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(to top, #13132b, var(--dark));
+            padding: 5rem 0 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: var(--primary);
+            filter: blur(150px);
+            opacity: 0.05;
+            top: 0;
+            left: 30%;
+        }
+        
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .footer-top {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+        
+        .footer-logo {
+            color: white;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-logo i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .footer-text {
+            color: #ccc;
+            margin-bottom: 2rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .social-link:hover {
+            background: var(--gradient);
+            transform: translateY(-5px);
+        }
+        
+        .footer-title {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            background: var(--gradient);
+            bottom: 0;
+            left: 0;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .footer-links a i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .header-content h1 {
+                font-size: 4rem;
+            }
+            
+            .about-content, .contact-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .about-image, .contact-form {
+                order: -1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content h1 {
+                font-size: 3rem;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(26, 26, 46, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 1.5rem;
+                flex-direction: column;
+                align-items: center;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links li {
+                margin: 1rem 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        /* Lightbox for portfolio items */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .lightbox-content {
+            position: relative;
+            max-width: 80%;
+            max-height: 80vh;
+        }
+        
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            border-radius: 5px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .lightbox-close:hover {
+            transform: rotate(90deg);
+        }
+        
+        .lightbox-caption {
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            padding: 0 2rem;
+        }
+        
+        .lightbox-nav button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lightbox-nav button:hover {
+            background: var(--primary);
+        }
+
+        /* Special 3D printer animation */
+        .printer-animation {
+            position: absolute;
+            top: -50px;
+            right: 50px;
+            width: 200px;
+            height: 200px;
+            z-index: 10;
+            opacity: 0;
+            animation: fadeUp 1s forwards 2s;
+        }
+        
+        .printer-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 20s infinite linear;
+        }
+        
+        .printer-side {
+            position: absolute;
+            background: var(--dark);
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+        }
+        
+        .front, .back {
+            width: 80px;
+            height: 100px;
+        }
+        
+        .left, .right {
+            width: 80px;
+            height: 100px;
+        }
+        
+        .top, .bottom {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .front { transform: translateZ(40px); }
+        .back { transform: translateZ(-40px) rotateY(180deg); }
+        .left { transform: translateX(-40px) rotateY(-90deg); }
+        .right { transform: translateX(40px) rotateY(90deg); }
+        .top { transform: translateY(-40px) rotateX(90deg); }
+        .bottom { transform: translateY(40px) rotateX(-90deg); }
+        
+        @keyframes rotate {
+            0% { transform: rotateX(0) rotateY(0); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+        
+        /* CSS for 3D printing layer effect */
+        .layer-animation {
+            position: relative;
+            width: 100%;
+            height: 100px;
+            margin-top: 3rem;
+            overflow: hidden;
+        }
+        
+        .layer {
+            position: absolute;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+            animation: layerPrint 3s infinite;
+        }
+        
+        @keyframes layerPrint {
+            0% {
+                top: 0;
+                width: 0;
+                opacity: 1;
+            }
+            50% {
+                width: 100%;
+                opacity: 1;
+            }
+            100% {
+                top: 100px;
+                width: 0;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="loader-wrapper">
+        <div class="loader">
+            <div class="cube cube1"></div>
+            <div class="cube cube2"></div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo"><i class="fas fa-cube"></i> JOURNEY ON DESIGN LAB</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#tech">Technology</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 3D Printer Animation -->
+    <div class="printer-animation">
+        <div class="printer-container">
+            <div class="printer-side front"></div>
+            <div class="printer-side back"></div>
+            <div class="printer-side left"></div>
+            <div class="printer-side right"></div>
+            <div class="printer-side top"></div>
+            <div class="printer-side bottom"></div>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header id="home">
+        <div class="header-bg"></div>
+        <div class="header-overlay"></div>
+        <div id="particles-js"></div>
+        <div class="header-content">
+            <h1>Journey On Design Lab</h1>
+            <p>Transforming imagination into reality with cutting-edge technology and creative excellence</p>
+            <a href="#portfolio" class="header-btn">View Our Portfolio</a>
+            
+            <!-- 3D Printing Layer Animation -->
+            <div class="layer-animation">
+                <div class="layer"></div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <h2 class="section-title">About Our Studio</h2>
+        <div class="about-image">
+            <div class="about-image-wrapper">
+                <img src="images/banner_etsy_01.png" alt="3D Printing in Action">
+            </div>
+        </div>
+        <div class="about-content">
+            <div class="about-text">
+                <h2>Pushing the Boundaries of 3D Printing</h2>
+                <p>We are a husband and wife team dedicated to the art and science of converting ideas into reality. Our goal is to transform your concepts into tangible reality using the latest 3D printing technologies and materials.</p>
+                <p>With over 15 years of experinece in engineering research and development, we aim to use our expertise to make your idea come to life.</p>
+                <div class="about-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">100+</div>
+                        <div class="stat-text">Completed Projects</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-text">Different Materials</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0.02mm</div>
+                        <div class="stat-text">Precision Level</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-text">Client Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio-section">
+        <h2 class="section-title">Our Portfolio</h2>
+        <div class="portfolio-filters">
+            <button class="filter-btn active" data-filter="all">All Projects</button>
+            <button class="filter-btn" data-filter="jewelry">Jewelry</button>
+            <button class="filter-btn" data-filter="artistic">Artistic</button>
+            <button class="filter-btn" data-filter="engineering">Engineering</button>
+            <button class="filter-btn" data-filter="prototypes">Prototypes</button>
+            <button class="filter-btn" data-filter="accesories">Accesories</button>
+        </div>
+        <div class="portfolio-grid">
+            <!-- Portfolio Item 1 -->
+            <div class="portfolio-item" data-category="jewelry">
+                <div class="portfolio-img">
+                    <img src="images/jewelry_01.jpg" alt="Karate Belt Earrings">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Karate Belt Earrings</h3>
+                    <p>Custom Martial Arts Inspired Karate Earrings</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 1 -->
+            <div class="portfolio-item" data-category="jewelry">
+                <div class="portfolio-img">
+                    <img src="images/jewelry_02.jpg" alt="Karate Belt Earrings">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Wing Chun Earrings</h3>
+                    <p>Custom Martial Arts Inspired Wing Chun Earrings</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>     
+
+            <!-- Portfolio Item 3 -->
+            <div class="portfolio-item" data-category="artistic">
+                <div class="portfolio-img">
+                    <img src="images/artistic_05.jpeg" alt="Automotive Custom Parts">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Custom Anime Figure Design</h3>
+                    <p>Highly detailed settings, ideal for miniature figures </p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="artistic">
+                <div class="portfolio-img">
+                    <img src="images/artistic_02.jpeg" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Artistic Infinity Frame</h3>
+                    <p>A combination of 3D printing and lighting to create an eye-catching display.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>       
+
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="artistic">
+                <div class="portfolio-img">
+                    <img src="images/artistic_01.jpeg" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Lithophane Light Design</h3>
+                    <p>Not many know but 3D printed images are possible, here is an example.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>     
+            
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="artistic">
+                <div class="portfolio-img">
+                    <img src="images/IRON MAN HELMET.JPG" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Cosplay Parts</h3>
+                    <p>A 3D printed wearable Iron Man helmet.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div> 
+
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="artistic">
+                <div class="portfolio-img">
+                    <img src="images/yoda.JPG" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Miniature Yoda head bust.</h3>
+                    <p>Head bust of Yoda.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>    
+
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="artistic">
+                <div class="portfolio-img">
+                    <img src="images/artistic_04.jpeg" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Artistic Sculpture</h3>
+                    <p>Complex artistic design showcasing the creative possibilities of 3D printing.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>  
+
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="artistic">
+                <div class="portfolio-img">
+                    <img src="images/artistic_06.jpeg" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>T-Rex and Terminator Hybrid</h3>
+                    <p>3d printed mash up of a T-Rex skull with Terminator vibes.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>  
+            
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="engineering">
+                <div class="portfolio-img">
+                    <img src="images/engineering_parts.JPG" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Miscellaneous Engineering Components</h3>
+                    <p>Possibilities are endless from jacks to wrenches.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 4 -->
+            <div class="portfolio-item" data-category="engineering">
+                <div class="portfolio-img">
+                    <img src="images/engineering_01.JPG" alt="Artistic Sculpture">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Engineering Component</h3>
+                    <p>Complex engineering component</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>            
+
+            <!-- Portfolio Item 5 -->
+            <div class="portfolio-item" data-category="prototypes">
+                <div class="portfolio-img">
+                    <img src="images/prototype.JPG" alt="Engineering Prototype">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Engineering Prototype</h3>
+                    <p>Functional engineering prototype with moving parts and high durability.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Portfolio Item 6 -->
+            <div class="portfolio-item" data-category="prototypes">
+                <div class="portfolio-img">
+                    <img src="images/prototype_02.jpeg" alt="Custom Jewelry Design">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Engineering Multisensor Prototype</h3>
+                    <p>Electronic housing for an engineering sensor prototype</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 2 -->
+            <div class="portfolio-item" data-category="accesories">
+                <div class="portfolio-img">
+                    <img src="images/custom_keychain3.JPG" alt="Architectural Scale Model">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Custom Keychain</h3>
+                    <p>Custom keychain, displaying your school colors, can be customized with name.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 2 -->
+            <div class="portfolio-item" data-category="accesories">
+                <div class="portfolio-img">
+                    <img src="images/accesories_02.jpeg" alt="Architectural Scale Model">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Apple Watch Custom Covers</h3>
+                    <p>Disney inpsired apple watch covers for your next Disney trip.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 2 -->
+            <div class="portfolio-item" data-category="accesories">
+                <div class="portfolio-img">
+                    <img src="images/accessories_01.JPG" alt="Architectural Scale Model">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Miscellaneous wearable accesories</h3>
+                    <p>Variety of custom wearable accesories for a school project.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 2 -->
+            <div class="portfolio-item" data-category="accesories">
+                <div class="portfolio-img">
+                    <img src="images/tablet_holder.JPG" alt="Architectural Scale Model">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Tablet/Smartphone Holder</h3>
+                    <p>Simple, functional holder for phone or tablet.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Item 2 -->
+            <div class="portfolio-item" data-category="accesories">
+                <div class="portfolio-img">
+                    <img src="images/accesories_03.JPG" alt="Architectural Scale Model">
+                </div>
+                <div class="portfolio-overlay">
+                    <h3>Custom Trombone Mouthpiece</h3>
+                    <p>Mounthpieces for musical instruments can be customized to show your custom logo or name.</p>
+                    <div class="portfolio-buttons">
+                        <a href="#" class="portfolio-btn lightbox-trigger"><i class="fas fa-search-plus"></i></a>
+                        <a href="#" class="portfolio-btn"><i class="fas fa-link"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+    </section>
+    
+    <!-- Technology Section -->
+    <section id="tech" class="tech-section">
+        <div class="tech-container">
+            <div class="tech-title">
+                <h2>Our Technology</h2>
+                <p>We use state-of-the-art equipment and materials to bring your projects to life with exceptional quality and precision.</p>
+            </div>
+            <div class="tech-items">
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <h3>FDM Printing</h3>
+                    <p>Perfect for functional prototypes and durable parts with a range of engineering-grade thermoplastics.</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <h3>SLA/DLP Printing</h3>
+                    <p>Ultra-high resolution printing for detailed models, jewelry, and dental applications.</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-pencil-ruler"></i>
+                    </div>
+                    <h3>3D Design</h3>
+                    <p>Expert CAD design services to help you optimize your models for 3D printing.</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h3>Post-Processing</h3>
+                    <p>Comprehensive finishing services including sanding, painting, and surface coatings.</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-vr-cardboard"></i>
+                    </div>
+                    <h3>3D Scanning</h3>
+                    <p>High-precision 3D scanning to reverse engineer existing objects.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="contact-overlay"></div>
+        <div class="contact-container">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-content">
+                <div class="contact-text">
+                    <h2>Ready to Start Your Project?</h2>
+                    <p>Whether you have a detailed design ready for printing or just a concept that needs development, we're here to help bring your ideas to life.</p>
+                    <p>Reach out to discuss your project requirements, request a quote, or schedule a consultation with our team.</p>
+                    <div class="contact-info">
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-info-text">
+                                <h4>Email Us</h4>
+                                <p>designlab@journeyon.co</p>
+                            </div>
+                        </div>
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div class="contact-info-text">
+                                <h4>Call Us</h4>
+                                <p>(956) 381-2159</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Subject">
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-about">
+                    <a href="#" class="footer-logo"><i class="fas fa-cube"></i> JOURNEY ON DESIGN LAB</a>
+                    <p class="footer-text">We're passionate about pushing the boundaries of what's possible with 3D printing technology. Our mission is to deliver exceptional quality and innovative solutions for all your 3D printing needs.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-etsy"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links-section">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#about"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="#portfolio"><i class="fas fa-chevron-right"></i> Portfolio</a></li>
+                        <li><a href="#tech"><i class="fas fa-chevron-right"></i> Technology</a></li>
+                        <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links-section">
+                    <h3 class="footer-title">Our Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Rapid Prototyping</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Small Batch Production</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Custom Design</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> 3D Scanning</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Post-Processing</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Journey On. All rights reserved. | Designed with <i class="fas fa-heart" style="color: var(--primary);"></i> for innovation</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Lightbox for portfolio items -->
+    <div class="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close">&times;</button>
+            <img class="lightbox-img" src="" alt="Enlarged portfolio item">
+            <div class="lightbox-caption"></div>
+            <div class="lightbox-nav">
+                <button class="lightbox-prev"><i class="fas fa-chevron-left"></i></button>
+                <button class="lightbox-next"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Particles.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    
+    <script>
+        // Page loader
+        window.addEventListener('load', function() {
+            const loader = document.querySelector('.loader-wrapper');
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }, 1500);
+        });
+        
+        // Initialize particles.js
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof particlesJS !== 'undefined') {
+                particlesJS('particles-js', {
+                    "particles": {
+                        "number": {
+                            "value": 80,
+                            "density": {
+                                "enable": true,
+                                "value_area": 800
+                            }
+                        },
+                        "color": {
+                            "value": "#ff6b6b"
+                        },
+                        "shape": {
+                            "type": "circle",
+                            "stroke": {
+                                "width": 0,
+                                "color": "#000000"
+                            },
+                        },
+                        "opacity": {
+                            "value": 0.5,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 1,
+                                "opacity_min": 0.1,
+                                "sync": false
+                            }
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 2,
+                                "size_min": 0.1,
+                                "sync": false
+                            }
+                        },
+                        "line_linked": {
+                            "enable": true,
+                            "distance": 150,
+                            "color": "#4ecdc4",
+                            "opacity": 0.4,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 1,
+                            "direction": "none",
+                            "random": true,
+                            "straight": false,
+                            "out_mode": "out",
+                            "bounce": false,
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": {
+                            "onhover": {
+                                "enable": true,
+                                "mode": "bubble"
+                            },
+                            "onclick": {
+                                "enable": true,
+                                "mode": "push"
+                            },
+                            "resize": true
+                        },
+                        "modes": {
+                            "bubble": {
+                                "distance": 200,
+                                "size": 6,
+                                "duration": 2,
+                                "opacity": 0.8,
+                                "speed": 3
+                            },
+                            "push": {
+                                "particles_nb": 4
+                            }
+                        }
+                    },
+                    "retina_detect": true
+                });
+            }
+            
+            // Sticky navbar
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Mobile menu toggle
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+            
+            // Scroll animations
+            const animateOnScroll = function() {
+                const elements = document.querySelectorAll('.about-text, .about-image, .portfolio-item, .tech-item, .contact-text, .contact-form');
+                
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementPosition < windowHeight - 100) {
+                        element.classList.add('animated');
+                    }
+                });
+            };
+            
+            // Initial check for elements in viewport
+            animateOnScroll();
+            
+            // Check for elements on scroll
+            window.addEventListener('scroll', animateOnScroll);
+            
+            // Portfolio filter
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Get filter value
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Filter portfolio items
+                    portfolioItems.forEach(item => {
+                        if (filter === 'all') {
+                            item.style.display = 'block';
+                            setTimeout(() => {
+                                item.classList.add('animated');
+                            }, 100);
+                        } else if (item.getAttribute('data-category') === filter) {
+                            item.style.display = 'block';
+                            setTimeout(() => {
+                                item.classList.add('animated');
+                            }, 100);
+                        } else {
+                            item.classList.remove('animated');
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Lightbox functionality
+            const lightbox = document.querySelector('.lightbox');
+            const lightboxImg = document.querySelector('.lightbox-img');
+            const lightboxCaption = document.querySelector('.lightbox-caption');
+            const lightboxClose = document.querySelector('.lightbox-close');
+            const lightboxNext = document.querySelector('.lightbox-next');
+            const lightboxPrev = document.querySelector('.lightbox-prev');
+            const lightboxTriggers = document.querySelectorAll('.lightbox-trigger');
+            
+            let currentIndex = 0;
+            const lightboxItems = [];
+            
+            // Collect all portfolio items for lightbox
+            portfolioItems.forEach((item, index) => {
+                const img = item.querySelector('img').src;
+                const caption = item.querySelector('h3').textContent;
+                lightboxItems.push({ img, caption });
+            });
+            
+            // Open lightbox when clicking on portfolio items
+            lightboxTriggers.forEach((trigger, index) => {
+                trigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentIndex = index;
+                    updateLightbox();
+                    lightbox.style.display = 'flex';
+                });
+            });
+            
+            // Update lightbox content
+            function updateLightbox() {
+                lightboxImg.src = lightboxItems[currentIndex].img;
+                lightboxCaption.textContent = lightboxItems[currentIndex].caption;
+            }
+            
+            // Next image
+            lightboxNext.addEventListener('click', function() {
+                currentIndex = (currentIndex + 1) % lightboxItems.length;
+                updateLightbox();
+            });
+            
+            // Previous image
+            lightboxPrev.addEventListener('click', function() {
+                currentIndex = (currentIndex - 1 + lightboxItems.length) % lightboxItems.length;
+                updateLightbox();
+            });
+            
+            // Close lightbox
+            lightboxClose.addEventListener('click', function() {
+                lightbox.style.display = 'none';
+            });
+            
+            // Close when clicking outside the image
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox) {
+                    lightbox.style.display = 'none';
+                }
+            });
+            
+            // Animation for 3D printing layer effect
+            setInterval(() => {
+                const layer = document.querySelector('.layer');
+                if (layer) {
+                    const newLayer = layer.cloneNode(true);
+                    document.querySelector('.layer-animation').appendChild(newLayer);
+                    
+                    setTimeout(() => {
+                        layer.remove();
+                    }, 3000);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
